@@ -4,6 +4,18 @@ local PlayersFolder = findfirstchild(MapFolder, "Players")
 
 local TrackedModels = {}
 local ModelCounter = 0
+local LocalPlayerName = nil
+
+pcall(function()
+    local localPlayer = getlocalplayer()
+    if localPlayer then
+        LocalPlayerName = getname(localPlayer)
+        print("RushPoint: Found local player:", LocalPlayerName)
+    else
+        warn("RushPoint: Could not get local player instance.")
+    end
+end)
+
 
 local function GenerateUniqueKey(model)
     ModelCounter = ModelCounter + 1
@@ -78,9 +90,9 @@ local function CreateModelData(model, parts, uniqueKey)
         Team = isFriendly,
         Whitelisted = false,
         Archenemies = false,
-        Aimbot_Part = parts.UpperTorso,
-        Aimbot_TP_Part = parts.RootPart,
-        Triggerbot_Part = parts.UpperTorso,
+        Aimbot_Part = parts.Head,
+        Aimbot_TP_Part = parts.Head,
+        Triggerbot_Part = parts.Head,
     }
 
     return uniqueKey, data
@@ -89,6 +101,15 @@ end
 local function UpdateModels()
     if not PlayersFolder then return end
 
+    if not LocalPlayerName then
+        pcall(function()
+            local localPlayer = getlocalplayer()
+            if localPlayer then
+                LocalPlayerName = getname(localPlayer)
+            end
+        end)
+    end
+
     local currentModels = {}
     pcall(function() currentModels = getchildren(PlayersFolder) end)
 
@@ -96,30 +117,34 @@ local function UpdateModels()
 
     for _, instance in ipairs(currentModels) do
         local isPlayerModel = false
+        local instanceName = nil
         pcall(function()
             if getclassname(instance) == "Model" then
                 isPlayerModel = true
+                instanceName = getname(instance)
             end
         end)
 
-        if isPlayerModel then
-            local model = instance
-            seenModels[model] = true
+        if not isPlayerModel or (LocalPlayerName and instanceName == LocalPlayerName) then
+            if isPlayerModel and LocalPlayerName and instanceName == LocalPlayerName then
+            end
+            continue
+        end
 
-            if not TrackedModels[model] then
-                local parts = GetBodyParts(model)
-                if parts then
-                    local uniqueKey = GenerateUniqueKey(model)
-                    local _, modelData = CreateModelData(model, parts, uniqueKey)
+        local model = instance
+        seenModels[model] = true
 
-                    local success, err = pcall(add_model_data, modelData, uniqueKey)
-                    if success then
-                        TrackedModels[model] = uniqueKey
-                        -- print("Added Rush Point model", uniqueKey)
-                    else
-                        -- warn("Failed to add Rush Point model", uniqueKey, "-", err)
-                        ModelCounter = ModelCounter - 1
-                    end
+        if not TrackedModels[model] then
+            local parts = GetBodyParts(model)
+            if parts then
+                local uniqueKey = GenerateUniqueKey(model)
+                local _, modelData = CreateModelData(model, parts, uniqueKey)
+
+                local success, err = pcall(add_model_data, modelData, uniqueKey)
+                if success then
+                    TrackedModels[model] = uniqueKey
+                else
+                    ModelCounter = ModelCounter - 1
                 end
             end
         end
@@ -135,7 +160,6 @@ local function UpdateModels()
     for _, removalInfo in ipairs(modelsToRemove) do
          local success, err = pcall(remove_model_data, removalInfo.key)
          if success then
-             -- print("Removed Rush Point model", removalInfo.key)
          else
              warn("Failed to remove Rush Point model", removalInfo.key, "-", err)
          end
