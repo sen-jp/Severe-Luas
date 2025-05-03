@@ -45,11 +45,9 @@ local function CreateModelData(model, parts, uniqueKey)
         Username = playerName,
         Displayname = playerName .. " (" .. modelName .. ")", 
         Userid = 0, 
-
         Character = model,
         PrimaryPart = parts.RootPart,
         Humanoid = parts.Head, 
-
         Head = parts.Head,
         Torso = parts.TorsoFront,
         UpperTorso = parts.TorsoFront,
@@ -66,7 +64,6 @@ local function CreateModelData(model, parts, uniqueKey)
         Team = isFriendly,
         Whitelisted = false,
         Archenemies = false,
-
         Aimbot_Part = parts.TorsoFront,
         Aimbot_TP_Part = parts.RootPart,
         Triggerbot_Part = parts.TorsoFront,
