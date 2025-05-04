@@ -4,15 +4,16 @@ Luas made specifically for the Roblox External "Severe"
 Requests can be sent to me on Discord, my tag is **8127893746** & my ID is **638836619054415921** - make sure it's me before you run something lol
 
 # Supported Games
-## FRONTLINES
+## FRONTLINES (Severe Support)
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/Frontlines.lua) | [Game](https://www.roblox.com/games/5938036553)
-## RUSH POINT
+## RUSH POINT (Severe Support) 
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/RushPoint.lua) | [Game](https://www.roblox.com/games/5993942214)
-## town
-[Script](https://github.com/sen-jp/Severe-Luas/blob/main/town.lua) | [Game](https://www.roblox.com/games/4991214437)
-## RIOTFALL [Beta]
+## ~~town (Severe Support)~~ Works but not needed anymore.
+~~[Script](https://github.com/sen-jp/Severe-Luas/blob/main/town.lua) | [Game](https://www.roblox.com/games/4991214437)~~
+## RIOTFALL [Beta] (Severe Support)
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/RIOTFALL.lua) | [Game](https://www.roblox.com/games/7796842481)
-
+## Football Fusion 2 (Jump Boost)
+[Script](https://github.com/sen-jp/Severe-Luas/blob/main/FootballFusion2.lua) | [Game](https://www.roblox.com/games/8204899140)
 
 # QoL
 ## Clear Console
