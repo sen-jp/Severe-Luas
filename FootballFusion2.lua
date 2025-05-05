@@ -1,5 +1,5 @@
 local LocalPlayer = getlocalplayer()
-local jumpBoost = 0.3
+local jumpBoost = 7
 local spacePressedLastFrame = false
 local lastBoostTime = 0
 local cooldownDuration = 3
@@ -50,8 +50,9 @@ local function keybindloop()
                         local hrp = findfirstchild(char, "HumanoidRootPart")
                         local humanoid = findfirstchild(char, "Humanoid")
                         if hrp and humanoid and gethealth(humanoid) > 0 then
-                            local currentvelocity = getvelocity(hrp)
-                            setvelocity(hrp, {currentvelocity.x, currentvelocity.y + jumpBoost, currentvelocity.z})
+                            local currentvelocity = getposition(hrp)
+                            wait(0.1)
+                            setposition(hrp, {currentvelocity.x, currentvelocity.y + jumpBoost, currentvelocity.z})
                             lastBoostTime = currentTime
                         end
                     end
