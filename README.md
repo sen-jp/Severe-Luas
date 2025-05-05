@@ -14,7 +14,11 @@ Requests can be sent to me on Discord, my tag is **8127893746** & my ID is **638
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/RIOTFALL.lua) | [Game](https://www.roblox.com/games/7796842481)
 ## Football Fusion 2 (Jump Boost)
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/FootballFusion2.lua) | [Game](https://www.roblox.com/games/8204899140)
+## Dead Rails [Alpha] (Partial Severe Support)
+[Script](https://github.com/sen-jp/Severe-Luas/blob/main/Deadrails.lua) | [Game](https://www.roblox.com/games/116495829188952)
 
 # QoL
+## Auto Indexer (Automatically attempts to support the game it is executed on)
+[R6](https://github.com/sen-jp/Severe-Luas/blob/main/AutoIndexR6.lua) | [R15] (NOT DONE YET)
 ## Clear Console
 [Script](https://github.com/sen-jp/Severe-Luas/blob/main/clear_console.lua)
