@@ -5,14 +5,42 @@ local PlayersFolder = findfirstchild(MapFolder, "Players")
 local TrackedModels = {}
 local ModelCounter = 0
 local LocalPlayerName = nil
+local localPlayerTeam = nil
+
+local function getPlayerTeam(model)
+    if not model then return nil end
+    local permanentTeamValueInstance = findfirstchild(model, "PermanentTeam")
+    if permanentTeamValueInstance then
+        local success, teamValue = pcall(function()
+            return getvalue(permanentTeamValueInstance)
+        end)
+        if success then
+            return teamValue
+        end
+    end
+    return nil
+end
 
 pcall(function()
-    local localPlayer = getlocalplayer()
-    if localPlayer then
-        LocalPlayerName = getname(localPlayer)
-        print("RushPoint: Found local player:", LocalPlayerName)
+    local localPlayerInstance = getlocalplayer()
+    if localPlayerInstance then
+        LocalPlayerName = getname(localPlayerInstance)
+        print("Found local player:", LocalPlayerName)
+        if PlayersFolder and LocalPlayerName then
+            local localPlayerModel = findfirstchild(PlayersFolder, LocalPlayerName)
+            if localPlayerModel then
+                localPlayerTeam = getPlayerTeam(localPlayerModel)
+                if localPlayerTeam then
+                    print("Local player team is:", tostring(localPlayerTeam))
+                else
+                    warn("Could not determine local player's team from model:", LocalPlayerName)
+                end
+            else
+                warn("Local player model not found in PlayersFolder for team check:", LocalPlayerName)
+            end
+        end
     else
-        warn("RushPoint: Could not get local player instance.")
+        warn("Could not get local player instance.")
     end
 end)
 
@@ -54,8 +82,8 @@ local function GetBodyParts(model)
     end
     
     local modelName = getname(model)
-    if modelName ~= "Sand Wall" and modelName ~= "Combat Turret" then
-        warn("Missing essential parts in model:", modelName)
+    if modelName ~= "Sand Wall" or modelName ~= "Combat Turret" then
+        --warn("Missing essential parts in model:", modelName)
     end
     return nil
 end
@@ -103,11 +131,34 @@ local function UpdateModels()
 
     if not LocalPlayerName then
         pcall(function()
-            local localPlayer = getlocalplayer()
-            if localPlayer then
-                LocalPlayerName = getname(localPlayer)
+            local localPlayerInstance = getlocalplayer()
+            if localPlayerInstance then
+                LocalPlayerName = getname(localPlayerInstance)
+                if PlayersFolder and LocalPlayerName then
+                    local localPlayerModel = findfirstchild(PlayersFolder, LocalPlayerName)
+                    if localPlayerModel then
+                        localPlayerTeam = getPlayerTeam(localPlayerModel)
+                        if localPlayerTeam then
+                             --print("Local player team is:", tostring(localPlayerTeam))
+                        else
+                            warn("Could not get local player's team for:", LocalPlayerName)
+                        end
+                    end
+                end
             end
         end)
+    elseif LocalPlayerName and not localPlayerTeam then
+        if PlayersFolder then
+            local localPlayerModel = findfirstchild(PlayersFolder, LocalPlayerName)
+            if localPlayerModel then
+                localPlayerTeam = getPlayerTeam(localPlayerModel)
+                if localPlayerTeam then
+                    print("[Refresh]: Local player team is:", tostring(localPlayerTeam))
+                else
+                    warn("[Refresh]: Failed to get local player team for:", LocalPlayerName)
+                end
+            end
+        end
     end
 
     local currentModels = {}
@@ -116,19 +167,28 @@ local function UpdateModels()
     local seenModels = {}
 
     for _, instance in ipairs(currentModels) do
-        local isPlayerModel = false
+        local isModelInstance = false
         local instanceName = nil
         pcall(function()
             if getclassname(instance) == "Model" then
-                isPlayerModel = true
+                isModelInstance = true
                 instanceName = getname(instance)
             end
         end)
 
-        if not isPlayerModel or (LocalPlayerName and instanceName == LocalPlayerName) then
-            if isPlayerModel and LocalPlayerName and instanceName == LocalPlayerName then
-            end
+        if not isModelInstance then
             continue
+        end
+
+        if LocalPlayerName and instanceName == LocalPlayerName then
+            continue
+        end
+
+        if localPlayerTeam then
+            local currentInstanceTeam = getPlayerTeam(instance)
+            if currentInstanceTeam and currentInstanceTeam == localPlayerTeam then
+                continue
+            end
         end
 
         local model = instance
@@ -161,7 +221,7 @@ local function UpdateModels()
          local success, err = pcall(remove_model_data, removalInfo.key)
          if success then
          else
-             warn("Failed to remove Rush Point model", removalInfo.key, "-", err)
+             warn("Failed to remove model", removalInfo.key, "-", err)
          end
          TrackedModels[removalInfo.model] = nil
     end
@@ -180,7 +240,7 @@ spawn(function()
     while wait(0.5) do
         local success, err = pcall(UpdateModels)
         if not success then
-            warn("Error in Rush Point UpdateModels:", err)
+            warn("Error in 'UpdateModels':" .. err .. " | @ me on discord with a screenshot.")
         end
     end
 end)
