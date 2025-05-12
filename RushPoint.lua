@@ -180,6 +180,11 @@ local function UpdateModels()
             continue
         end
 
+        local cloneTag = findfirstchild(instance, "CloneTag")
+        if cloneTag then
+            continue 
+        end
+
         if LocalPlayerName and instanceName == LocalPlayerName then
             continue
         end
@@ -244,5 +249,48 @@ spawn(function()
         end
     end
 end)
+
+local function bHopLoop()
+    local localPlayer = getlocalplayer()
+    local spaceKeyValue = "Space"
+    local jumpForce = 50 
+    local pressDelay = 0.05 
+    local checkInterval = 0.03 
+
+    local keys, keysSuccess, spaceHeld
+    local character, primaryPart, currentVelocity, currentVelocitySuccess
+
+    while wait(checkInterval) do
+        keysSuccess, keys = pcall(getpressedkeys)
+
+        if keysSuccess and type(keys) == "table" then
+            spaceHeld = false
+            for _, keyNameInLoop in ipairs(keys) do
+                if keyNameInLoop == spaceKeyValue then
+                    spaceHeld = true
+                    break 
+                end
+            end
+
+            if spaceHeld then
+                if localPlayer then
+                    character = getcharacter(localPlayer)
+                    if character then
+                        primaryPart = getprimarypart(character)
+                        if primaryPart then
+                            currentVelocitySuccess, currentVelocity = pcall(getvelocity, primaryPart)
+                            if currentVelocitySuccess and type(currentVelocity) == "table" and currentVelocity.x ~= nil then
+                                pcall(setvelocity, primaryPart, {currentVelocity.x, jumpForce, currentVelocity.z})
+                                wait(pressDelay) 
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+spawn(bHopLoop)
 
 print("[Sen] RUSH POINT Support loaded successfully.")
