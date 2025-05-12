@@ -93,6 +93,11 @@ local function CreateModelData(model, parts, uniqueKey)
     pcall(function() modelName = getname(model) end)
     local playerName = modelName
 
+    local cloneTag = findfirstchild(model, "CloneTag")
+    if cloneTag then
+        playerName = playerName .. "_real"
+    end
+
     local isFriendly = false
 
     local data = {
@@ -177,39 +182,47 @@ local function UpdateModels()
         end)
 
         if not isModelInstance then
-            continue
-        end
+        else
+            if LocalPlayerName and instanceName == LocalPlayerName then
+            else
+                if localPlayerTeam then
+                    local currentInstanceTeam = getPlayerTeam(instance)
+                    if currentInstanceTeam and currentInstanceTeam == localPlayerTeam then
+                    else
+                        local model = instance
+                        seenModels[model] = true
 
-        local cloneTag = findfirstchild(instance, "CloneTag")
-        if cloneTag then
-            continue 
-        end
+                        if not TrackedModels[model] then
+                            local parts = GetBodyParts(model)
+                            if parts then
+                                local uniqueKey = GenerateUniqueKey(model)
+                                local _, modelData = CreateModelData(model, parts, uniqueKey)
 
-        if LocalPlayerName and instanceName == LocalPlayerName then
-            continue
-        end
-
-        if localPlayerTeam then
-            local currentInstanceTeam = getPlayerTeam(instance)
-            if currentInstanceTeam and currentInstanceTeam == localPlayerTeam then
-                continue
-            end
-        end
-
-        local model = instance
-        seenModels[model] = true
-
-        if not TrackedModels[model] then
-            local parts = GetBodyParts(model)
-            if parts then
-                local uniqueKey = GenerateUniqueKey(model)
-                local _, modelData = CreateModelData(model, parts, uniqueKey)
-
-                local success, err = pcall(add_model_data, modelData, uniqueKey)
-                if success then
-                    TrackedModels[model] = uniqueKey
+                                local success, err = pcall(add_model_data, modelData, uniqueKey)
+                                if success then
+                                    TrackedModels[model] = uniqueKey
+                                else
+                                    ModelCounter = ModelCounter - 1
+                                end
+                            end
+                        end
+                    end
                 else
-                    ModelCounter = ModelCounter - 1
+                    local model = instance
+                    seenModels[model] = true
+                    if not TrackedModels[model] then
+                        local parts = GetBodyParts(model)
+                        if parts then
+                            local uniqueKey = GenerateUniqueKey(model)
+                            local _, modelData = CreateModelData(model, parts, uniqueKey)
+                            local success, err = pcall(add_model_data, modelData, uniqueKey)
+                            if success then
+                                TrackedModels[model] = uniqueKey
+                            else
+                                ModelCounter = ModelCounter - 1
+                            end
+                        end
+                    end
                 end
             end
         end
@@ -249,48 +262,5 @@ spawn(function()
         end
     end
 end)
-
-local function bHopLoop()
-    local localPlayer = getlocalplayer()
-    local spaceKeyValue = "Space"
-    local jumpForce = 50 
-    local pressDelay = 0.05 
-    local checkInterval = 0.03 
-
-    local keys, keysSuccess, spaceHeld
-    local character, primaryPart, currentVelocity, currentVelocitySuccess
-
-    while wait(checkInterval) do
-        keysSuccess, keys = pcall(getpressedkeys)
-
-        if keysSuccess and type(keys) == "table" then
-            spaceHeld = false
-            for _, keyNameInLoop in ipairs(keys) do
-                if keyNameInLoop == spaceKeyValue then
-                    spaceHeld = true
-                    break 
-                end
-            end
-
-            if spaceHeld then
-                if localPlayer then
-                    character = getcharacter(localPlayer)
-                    if character then
-                        primaryPart = getprimarypart(character)
-                        if primaryPart then
-                            currentVelocitySuccess, currentVelocity = pcall(getvelocity, primaryPart)
-                            if currentVelocitySuccess and type(currentVelocity) == "table" and currentVelocity.x ~= nil then
-                                pcall(setvelocity, primaryPart, {currentVelocity.x, jumpForce, currentVelocity.z})
-                                wait(pressDelay) 
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-spawn(bHopLoop)
 
 print("[Sen] RUSH POINT Support loaded successfully.")
