@@ -18,10 +18,10 @@ local function GetBodyParts(Model)
         Head = findfirstchild(Model, "Head"),
         Torso = findfirstchild(Model, "Torso") or findfirstchild(Model, "UpperTorso"),
         HumanoidRootPart = findfirstchild(Model, "HumanoidRootPart") or findfirstchild(Model, "RootPart"),
-        LeftArm = findfirstchild(Model, "Left Arm") or findfirstchild(Model, "LeftUpperArm"),
-        RightArm = findfirstchild(Model, "Right Arm") or findfirstchild(Model, "RightUpperArm"),
-        LeftLeg = findfirstchild(Model, "Left Leg") or findfirstchild(Model, "LeftUpperLeg"),
-        RightLeg = findfirstchild(Model, "Right Leg") or findfirstchild(Model, "RightUpperLeg"),
+        LeftArm = findfirstchild(Model, "Left Arm") or findfirstchild(Model, "LeftUpperArm") or findfirstchild(Model, "LeftLowerArm"),
+        RightArm = findfirstchild(Model, "Right Arm") or findfirstchild(Model, "RightUpperArm") or findfirstchild(Model, "RightLowerArm"),
+        LeftLeg = findfirstchild(Model, "Left Leg") or findfirstchild(Model, "LeftUpperLeg") or findfirstchild(Model, "LeftLowerLeg"),
+        RightLeg = findfirstchild(Model, "Right Leg") or findfirstchild(Model, "RightUpperLeg") or findfirstchild(Model, "RightLowerLeg"),
         Humanoid = findfirstchild(Model, "Humanoid")
     }
 end
